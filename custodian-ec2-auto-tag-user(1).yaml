@@ -1,0 +1,28 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: cloud-custodian lambda policy
+Resources:
+  custodianec2autotaguser:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: custodian_policy.run
+      Runtime: python3.8
+      CodeUri: .
+      Description: cloud-custodian lambda policy
+      MemorySize: 512
+      Timeout: 900
+      Role: 'arn:aws:iam::425788440509:role/custodian-auto-tagger'
+      Events:
+        CloudWatchEvent1:
+          Type: CloudWatchEvent
+          Properties:
+            Pattern:
+              detail-type:
+                - AWS API Call via CloudTrail
+              detail:
+                eventSource:
+                  - ec2.amazonaws.com
+                eventName:
+                  - RunInstances
+      Tags:
+        custodian-info: 'mode=cloudtrail:version=0.9.13'
